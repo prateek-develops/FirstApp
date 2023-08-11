@@ -16,67 +16,29 @@ const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [isChecked, setIsChecked] = useState(false);
+  const passwordRegex = /^(?=.*[A-Z]).{8,}$/;
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
-  const handleLogin = () => {
-    if (!validateEmail(email)) {
-      alert('Invalid email format');
-    } else if (!validatePassword(password)) {
-      alert(passwordError);
+  const LoginFun = () => {
+    if (!email) {
+      alert('Please enter your email.');
+    } else if (!emailRegex.test(email)) {
+      alert('Invalid email.');
+    } else if (!password) {
+      alert('Please enter your password.');
+    } else if (!passwordRegex.test(password)) {
+      alert('Password should be minimum 8 characters and 1 uppercase.');
     } else {
       auth()
-        .createUserWithEmailAndPassword(email, password)
-        .then(() => {
-          console.log('User account created & signed in!');
+        .signInWithEmailAndPassword(email, password)
+        .then(res => {
+          console.log(JSON.stringify(res));
+          Alert.alert('User Logged In');
         })
         .catch(error => {
-          if (error.code === 'auth/email-already-in-use') {
-            console.log('That email address is already in use!');
-          }
-
-          if (error.code === 'auth/invalid-email') {
-            console.log('That email address is invalid!');
-          }
-
-          console.error(error);
+          console.log(error);
         });
     }
-  };
-  const userLogin = () => {
-    auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(res => {
-        console.log(JSON.stringify(res));
-        Alert.alert('User Logged In');
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
-  const validateEmail = email => {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-    return emailRegex.test(email);
-  };
-
-  const validatePassword = password => {
-    if (password.length < 8) {
-      setPasswordError('Password must be at least 8 characters');
-      return false;
-    }
-
-    const uppercaseRegex = /[A-Z]/;
-    if (!uppercaseRegex.test(password)) {
-      setPasswordError('Password must contain at least 1 uppercase letter');
-      return false;
-    }
-
-    const numberRegex = /[0-9]/;
-    if (!numberRegex.test(password)) {
-      setPasswordError('Password must contain at least 1 number');
-      return false;
-    }
-
-    setPasswordError('');
-    return true;
   };
 
   return (
@@ -107,7 +69,7 @@ const LoginScreen = () => {
       <TouchableOpacity
         style={styles.loginButton}
         disabled={!isChecked}
-        onPress={userLogin}>
+        onPress={LoginFun}>
         <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>
     </View>
